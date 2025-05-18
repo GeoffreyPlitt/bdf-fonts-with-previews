@@ -42,8 +42,8 @@ mkdir -p "$OUTPUT_DIR"
 for font in "${FONT_FILES[@]}"; do
     echo "Generating preview for $font..."
     
-    # Get full path to the font file
-    FONT_PATH="/Users/giro/bdf-fonts/$font"
+    # Get full path to the font file (using current directory)
+    FONT_PATH="$(pwd)/$font"
     
     # Output path
     OUTPUT_PATH="$OUTPUT_DIR/$font.png"
