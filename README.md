@@ -1,4 +1,4 @@
-# BDF Fonts with Previews
+# BDF Fonts
 
 These are BDF fonts, a simple bitmap font-format that can be created
 by many font tools. Given that these are bitmap fonts, they will look good on
