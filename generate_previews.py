@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 import sys
+import os
+import glob
 import argparse
 import re
 from PIL import Image, ImageDraw
@@ -154,7 +156,7 @@ def render_font_preview(input_filename, output_filename):
         draw = ImageDraw.Draw(image)
         
         # Add font name at the top
-        font_name = input_filename.split('/')[-1]
+        font_name = os.path.basename(input_filename)
         draw.text((margin, margin//2), font_name, fill='black')
         
         # Render each character
@@ -190,14 +192,61 @@ def render_font_preview(input_filename, output_filename):
         traceback.print_exc()
         return False
 
+def generate_all_previews():
+    # Directory where the previews will be saved
+    output_dir = "previews"
+    os.makedirs(output_dir, exist_ok=True)
+    
+    # Find all BDF font files in current directory
+    font_files = glob.glob("*.bdf")
+    
+    if not font_files:
+        print("No BDF font files found in the current directory.")
+        return False
+    
+    success_count = 0
+    failure_count = 0
+    
+    for font_file in font_files:
+        print(f"\nProcessing font: {font_file}")
+        
+        # Get full path to the font file
+        font_path = os.path.abspath(font_file)
+        
+        # Output path
+        output_path = os.path.join(output_dir, f"{font_file}.png")
+        
+        # Generate the preview
+        if render_font_preview(font_path, output_path):
+            success_count += 1
+        else:
+            failure_count += 1
+    
+    print(f"\nPreview generation complete.")
+    print(f"Successfully generated: {success_count} preview(s)")
+    print(f"Failed: {failure_count} preview(s)")
+    print(f"All previews saved in: {os.path.abspath(output_dir)}")
+    
+    return failure_count == 0
+
 def main():
-    parser = argparse.ArgumentParser(description='Generate preview image for BDF font')
-    parser.add_argument('input', help='Input BDF font file')
-    parser.add_argument('output', help='Output PNG image file')
+    parser = argparse.ArgumentParser(description='Generate preview images for BDF fonts')
+    parser.add_argument('--single', help='Process only a single BDF font file')
+    parser.add_argument('--output', help='Custom output PNG image file (for single mode)')
     
     args = parser.parse_args()
     
-    success = render_font_preview(args.input, args.output)
+    if args.single:
+        # Process a single font file
+        input_file = args.single
+        output_file = args.output or os.path.join("previews", f"{os.path.basename(input_file)}.png")
+        
+        os.makedirs(os.path.dirname(output_file), exist_ok=True)
+        success = render_font_preview(input_file, output_file)
+    else:
+        # Process all font files
+        success = generate_all_previews()
+    
     if not success:
         sys.exit(1)
 
