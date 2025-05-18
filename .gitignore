@@ -19,5 +19,5 @@ env/
 .vscode/
 *.swp
 
-# Generated preview files
-previews/*.png
+# Keep previews folder but ignore temporary files
+previews/.DS_Store
